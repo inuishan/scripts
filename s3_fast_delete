@@ -1,0 +1,4 @@
+# fast delete files from s3
+aws s3api list-objects-v2 --bucket $BUCKET --prefix $PREFIX --output text --query \
+'Contents[].[Key]' | grep -v -e "'" | tr '\n' '\0' | xargs -0 -P2 -n500 bash -c \
+'aws s3api delete-objects --bucket $BUCKET --delete "Objects=[$(printf "{Key=%q}," "$@")],Quiet=false"' _ 
